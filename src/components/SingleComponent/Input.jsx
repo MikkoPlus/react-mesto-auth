@@ -9,10 +9,15 @@ function Input({
   value,
   onChange,
   isPopupOpen,
+  inputClass,
 }) {
   const [isValid, setIsValid] = useState(false);
   const [validMessage, setValidMessage] = useState("");
   const [isDirty, setIsDirty] = useState(false);
+
+  const inputClassName = inputClass
+    ? `form__input ${inputClass}`
+    : "form__input";
 
   function handleInputChange(e) {
     setIsValid(e.target.validity.valid);
@@ -29,7 +34,7 @@ function Input({
         required
         name={name}
         type={type}
-        className={`form__input form__input_type_${type}`}
+        className={inputClassName}
         placeholder={placeholder}
         minLength={minLength}
         maxLength={maxLength}

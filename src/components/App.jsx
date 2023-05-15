@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { ApiRequestLoadingContext } from "../contexts/ApiRequestLoadingContext";
 
@@ -7,6 +8,9 @@ import Main from "./Main/Main";
 import Footer from "./Footer/Footer";
 import api from "../utils/Api";
 import Popups from "./Popups/Popups";
+import Register from "./Register/Register";
+import Login from "./Login/Login";
+import ProtectedRouteElement from "./ProtectedRoute/ProtectedRoute";
 
 function App() {
   const [selectedCard, setSelectedCard] = useState({});
@@ -19,7 +23,37 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [accessStatus, setAccessStatus] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [isMenuOpened, setIsMenuOpened] = useState(false);
+
+  function handleLogOut() {
+    localStorage.removeItem("jwt");
+    setLoggedIn(false);
+  }
+
+  function setAdditionalClass() {
+    return `translate-block${isMenuOpened ? " translate-block_active" : ""}`;
+  }
+
+  function handleChangeLoggedInState(bool) {
+    setLoggedIn(bool);
+  }
+
+  function handleChangeMenuVisability() {
+    setIsMenuOpened(!isMenuOpened);
+  }
+
+  function handleSetEmail(email) {
+    setUserEmail(email);
+  }
+
+  function changeAccessStatus(bool) {
+    setAccessStatus(bool);
+  }
 
   function handleLikeCard(card) {
     const isLiked = card.likes.some((human) => human._id === currentUser._id);
@@ -87,6 +121,10 @@ function App() {
     return setIsEditAvatarPopupOpen(true);
   }
 
+  function handleChangeTooltipVisability(bool) {
+    return setIsInfoTooltipOpen(bool);
+  }
+
   function handleEditProfileClick() {
     return setIsEditProfilePopupOpen(true);
   }
@@ -110,7 +148,8 @@ function App() {
     isEditProfilePopupOpen ||
     isAddPlacePopupOpen ||
     isConfirmPopupOpen ||
-    isImagePopupOpen;
+    isImagePopupOpen ||
+    isInfoTooltipOpen;
 
   useEffect(() => {
     function closeByEsc(evt) {
@@ -132,6 +171,7 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setIsConfirmPopupOpen(false);
     setIsImagePopupOpen(false);
+    setIsInfoTooltipOpen(false);
     setTimeout(() => {
       setSelectedCard({});
     }, 500);
@@ -153,21 +193,75 @@ function App() {
       .catch((err) => console.log(err));
   }, []);
 
+  useEffect(() => {
+    if (!loggedIn) {
+      setIsMenuOpened(false);
+    }
+  }, [loggedIn]);
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
-        <Header />
-        <Main
-          cards={cards}
-          onCardLike={handleLikeCard}
-          onEditAvatar={handleAvatarClick}
-          onEditProfile={handleEditProfileClick}
-          onAddCard={handleAddCardClick}
-          onTrashBagClick={handleTrashBagClick}
-          onCardClick={handleCardClick}
-          card={selectedCard}
+        <Header
+          additionalClass={setAdditionalClass()}
+          isLoggedIn={loggedIn}
+          userEmail={userEmail}
+          isMenuOpened={isMenuOpened}
+          handleChangeMenuVisability={handleChangeMenuVisability}
+          onLogOut={handleLogOut}
         />
-        <Footer />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              loggedIn ? (
+                <Navigate to="/home" replace />
+              ) : (
+                <Navigate to="sign-in" replace />
+              )
+            }
+          />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRouteElement
+                element={Main}
+                loggedIn={loggedIn}
+                cards={cards}
+                onCardLike={handleLikeCard}
+                onEditAvatar={handleAvatarClick}
+                onEditProfile={handleEditProfileClick}
+                onAddCard={handleAddCardClick}
+                onTrashBagClick={handleTrashBagClick}
+                onCardClick={handleCardClick}
+                card={selectedCard}
+                additionalClass={setAdditionalClass()}
+              />
+            }
+          />
+          <Route
+            path="/sign-up"
+            element={
+              <Register
+                changeTooltipVisability={handleChangeTooltipVisability}
+                changeAccessStatus={changeAccessStatus}
+              />
+            }
+          />
+          <Route
+            path="/sign-in"
+            element={
+              <Login
+                handleChangeLoggedInState={handleChangeLoggedInState}
+                handleSetEmail={handleSetEmail}
+                changeTooltipVisability={handleChangeTooltipVisability}
+                changeAccessStatus={changeAccessStatus}
+              />
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+        {loggedIn && <Footer additionalClass={setAdditionalClass()} />}
         <ApiRequestLoadingContext.Provider value={isLoading}>
           <Popups
             isEditProfilePopupOpen={isEditProfilePopupOpen}
@@ -175,6 +269,7 @@ function App() {
             isAddPlacePopupOpen={isAddPlacePopupOpen}
             isConfirmPopupOpen={isConfirmPopupOpen}
             isImagePopupOpen={isImagePopupOpen}
+            isInfoTooltipOpen={isInfoTooltipOpen}
             closeAllPopups={closeAllPopups}
             onUpdateAvatar={handleUpdateAvatar}
             onUpdateUser={handleUpdateUser}
@@ -182,6 +277,7 @@ function App() {
             onDeleteCard={handleDeleteCard}
             currentCardId={cardId}
             selectedCard={selectedCard}
+            accessStatus={accessStatus}
           />
         </ApiRequestLoadingContext.Provider>
       </div>

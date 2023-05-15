@@ -1,4 +1,4 @@
-.popup__button {
+.form__btn {
     width: 100%;
     display: block;
     margin: 38px auto 0;
@@ -17,6 +17,6 @@
     cursor: pointer;
 }
 
-.popup__button:hover {
+.form__btn:hover {
     opacity: .8;
 } 

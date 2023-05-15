@@ -3,6 +3,7 @@ import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
 import ConfirmDeletePopup from "./ConfirmDeletePopup";
+import InfoTooltip from "./InfoTooltip";
 
 function Popups({
   isEditProfilePopupOpen,
@@ -10,6 +11,7 @@ function Popups({
   isAddPlacePopupOpen,
   isConfirmPopupOpen,
   isImagePopupOpen,
+  isInfoTooltipOpen,
   closeAllPopups,
   onUpdateAvatar,
   onUpdateUser,
@@ -17,6 +19,7 @@ function Popups({
   onDeleteCard,
   currentCardId,
   selectedCard,
+  accessStatus,
 }) {
   return (
     <section className="popups">
@@ -49,6 +52,11 @@ function Popups({
         isOpen={isImagePopupOpen}
         onClose={closeAllPopups}
         card={selectedCard}
+      />
+      <InfoTooltip
+        isOpen={isInfoTooltipOpen}
+        onClose={closeAllPopups}
+        accessStatus={accessStatus}
       />
     </section>
   );

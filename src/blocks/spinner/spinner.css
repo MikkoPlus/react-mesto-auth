@@ -7,15 +7,17 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
-.spinner.entering {
-    animation: spinner-blur 0.3s linear forwards;
+.spinner_visible {
+  animation: show-spinner 0.3s linear forwards;
+  visibility: visible;
 }
 
-.spinner.exiting {
-  animation: spinner-blur 0.3s linear reverse;
+.spinner_hidden {
+  animation: hide-spinner 0.1s linear forwards;
+  visibility: hidden;
 }
 
-@keyframes spinner-blur {
+@keyframes show-spinner {
   0% {
     opacity: 0;
     transform: translate(-50%, -150%);
@@ -23,5 +25,16 @@
   100% {
     opacity: 1;
     transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes hide-spinner {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -150%);
   }
 }

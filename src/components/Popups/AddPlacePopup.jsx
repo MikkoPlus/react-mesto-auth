@@ -13,9 +13,7 @@ function EditProfilePopup({ isOpen, onClose, onAddPlace }) {
     }
   }, [isOpen]);
 
-  function handleSubmit(e) {
-    e.preventDefault();
-
+  function handleSubmit() {
     onAddPlace({
       name: placeName,
       link: placeUrl,
@@ -48,7 +46,6 @@ function EditProfilePopup({ isOpen, onClose, onAddPlace }) {
         placeholder="Ссылка на картинку"
         name="link"
         minLength="2"
-        maxLength="30"
         value={placeUrl}
         onChange={(e) => setPlaceUrl(e.target.value)}
         isPopupOpen={isOpen}

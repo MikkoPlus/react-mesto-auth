@@ -1,7 +1,7 @@
 import spinner from "../../images/icons/spinner.gif";
 
-function Spinner({className}) {
-  return <img className={className} src={spinner} alt="spinner" />;
+function Spinner({isLoading}) {
+  return <img className={`spinner spinner_${isLoading ? 'visible' : 'hidden'}`} src={spinner} alt="spinner" />;
 }
 
 export default Spinner;
