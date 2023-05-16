@@ -1,26 +1,11 @@
 import Form from "../SingleComponent/Form";
 import Input from "../SingleComponent/Input";
-import { useState, useEffect } from "react";
+import { useFormAndValidation } from "../../hooks/useFormAndValidation";
 
 function Sign({ name, title, btnText, handleSubmit, children }) {
-  const [formValue, setFormValue] = useState({ email: "", password: "" });
-  const { email, password } = formValue;
+  const { values, handleChange, errors, isValid } = useFormAndValidation();
 
-  const onInputChange = (evt) => {
-    const { name, value } = evt.target;
-
-    setFormValue({
-      ...formValue,
-      [name]: value,
-    });
-  };
-
-  useEffect(() => {
-    setFormValue({
-      email: email,
-      password: password,
-    });
-  }, [email, password]);
+  const { email, password } = values;
 
   return (
     <div className="sign">
@@ -28,27 +13,28 @@ function Sign({ name, title, btnText, handleSubmit, children }) {
         name={name}
         title={title}
         titleClass="form-title_type_sign"
-        handleSubmit={() => handleSubmit(formValue)}
+        handleSubmit={() => handleSubmit(values)}
         btnText={btnText}
         btnClass="form__btn_type_sign"
-        inputNames={["email", "password"]}
-        inputValues={[email, password]}
+        isFormValid={isValid}
       >
         <Input
           type="email"
           placeholder="Email"
           name="email"
           value={email}
-          onChange={(e) => onInputChange(e)}
+          onChange={handleChange}
           inputClass="form__input_type_sign"
+          error={errors.email}
         />
         <Input
           type="password"
           placeholder="Пароль"
           name="password"
           value={password}
-          onChange={(e) => onInputChange(e)}
+          onChange={handleChange}
           inputClass="form__input_type_sign"
+          error={errors.password}
         />
       </Form>
       {children}

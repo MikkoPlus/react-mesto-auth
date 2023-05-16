@@ -1,23 +1,21 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import PopupWithForm from "./PopupWithForm";
 import Input from "../SingleComponent/Input";
+import { useFormAndValidation } from "../../hooks/useFormAndValidation";
 
 function EditProfilePopup({ isOpen, onClose, onAddPlace }) {
-  const [placeName, setPlaceName] = useState("");
-  const [placeUrl, setPlaceUrl] = useState("");
+  const { values, handleChange, errors, isValid, resetForm } =
+    useFormAndValidation();
+
+  const { name, link } = values;
 
   useEffect(() => {
-    if (!isOpen) {
-      setPlaceName("");
-      setPlaceUrl("");
-    }
+    resetForm();
+    // eslint-disable-next-line
   }, [isOpen]);
 
   function handleSubmit() {
-    onAddPlace({
-      name: placeName,
-      link: placeUrl,
-    });
+    onAddPlace(values);
   }
 
   return (
@@ -28,8 +26,7 @@ function EditProfilePopup({ isOpen, onClose, onAddPlace }) {
       onClose={onClose}
       isOpen={isOpen}
       onSubmit={handleSubmit}
-      inputNames={["name", "link"]}
-      inputValues={[placeName, placeUrl]}
+      isFormValid={isValid}
     >
       <Input
         type="text"
@@ -37,18 +34,20 @@ function EditProfilePopup({ isOpen, onClose, onAddPlace }) {
         name="name"
         minLength="2"
         maxLength="30"
-        value={placeName}
-        onChange={(e) => setPlaceName(e.target.value)}
+        value={name}
+        onChange={handleChange}
         isPopupOpen={isOpen}
+        error={errors.name}
       />
       <Input
         type="url"
         placeholder="Ссылка на картинку"
         name="link"
         minLength="2"
-        value={placeUrl}
-        onChange={(e) => setPlaceUrl(e.target.value)}
+        value={link}
+        onChange={handleChange}
         isPopupOpen={isOpen}
+        error={errors.link}
       />
     </PopupWithForm>
   );

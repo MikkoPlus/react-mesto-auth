@@ -1,5 +1,5 @@
 import logo from "../../images/icons/logo.svg";
-import { Link, useLocation } from "react-router-dom";
+import { Link, Route, Routes } from "react-router-dom";
 
 function Header({
   additionalClass,
@@ -9,34 +9,9 @@ function Header({
   handleChangeMenuVisability,
   onLogOut,
 }) {
-  const location = useLocation().pathname;
-  const replaceData = {
-    signIn: {
-      replaceLink: "/sign-up",
-      replaceText: "Регистрация",
-    },
-    signUp: {
-      replaceLink: "/sign-in",
-      replaceText: "Войти",
-    },
-    signOut: {
-      replaceText: "Выйти",
-    },
-  };
-
   const onSignOut = () => {
     onLogOut();
   };
-
-  let currentLocationData;
-
-  if (location === "/sign-in") {
-    currentLocationData = replaceData.signIn;
-  } else if (location === "/sign-up") {
-    currentLocationData = replaceData.signUp;
-  } else if (location === "/home") {
-    currentLocationData = replaceData.signOut;
-  }
 
   const handleBurgerClick = () => {
     handleChangeMenuVisability();
@@ -47,32 +22,49 @@ function Header({
       <Link to="/" className="header__link">
         <img src={logo} alt="Mesto Russia" className="logo" />
       </Link>
-      {!isLoggedIn && location !== "/home" && (
-        <Link
-          to={currentLocationData?.replaceLink || ""}
-          className="header__replace-link"
-        >
-          {currentLocationData?.replaceText || ""}
-        </Link>
-      )}
-      {isLoggedIn && location === "/home" && (
-        <>
-          <div
-            onClick={handleBurgerClick}
-            className={`burger${isMenuOpened ? " burger_open" : ""}`}
-          >
-            <span className="burger-line"></span>
-          </div>
-          <div className="header__menu menu">
-            <ul className="menu__list">
-              <li className="menu__item">{userEmail}</li>
-              <li className="menu__item menu__itme_grey" onClick={onSignOut}>
-                {currentLocationData.replaceText}
-              </li>
-            </ul>
-          </div>
-        </>
-      )}
+      <Routes>
+        <Route
+          exact
+          path="/home"
+          element={
+            <>
+              <div
+                onClick={handleBurgerClick}
+                className={`burger${isMenuOpened ? " burger_open" : ""}`}
+              >
+                <span className="burger-line"></span>
+              </div>
+              <div className="header__menu menu">
+                <ul className="menu__list">
+                  <li className="menu__item">{userEmail}</li>
+                  <li
+                    className="menu__item menu__itme_grey"
+                    onClick={onSignOut}
+                  >
+                    Выйти
+                  </li>
+                </ul>
+              </div>
+            </>
+          }
+        ></Route>
+        <Route
+          path="/sign-up"
+          element={
+            <Link to="/sign-in" className="header__replace-link">
+              Войти
+            </Link>
+          }
+        ></Route>
+        <Route
+          path="/sign-in"
+          element={
+            <Link to="/sign-up" className="header__replace-link">
+              Регистрация
+            </Link>
+          }
+        ></Route>
+      </Routes>
     </header>
   );
 }

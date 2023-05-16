@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useContext } from "react";
+import { useContext } from "react";
 import { ApiRequestLoadingContext } from "../../contexts/ApiRequestLoadingContext";
 import Spinner from "../SingleComponent/Spinner";
 
@@ -7,14 +7,13 @@ function Form({
   title,
   children,
   handleSubmit,
-  inputNames,
-  inputValues,
   btnText,
   titleClass,
   btnClass,
+  isFormValid
 }) {
   const isLoading = useContext(ApiRequestLoadingContext);
-  const [isFormValid, setIsFormValid] = useState(false);
+
 
   const btnClassName = btnClass ? `form__btn ${btnClass}` : "form__btn";
 
@@ -23,31 +22,10 @@ function Form({
     handleSubmit();
   };
 
-  const formRef = useRef();
-
-  function checkInputValidity(inputName) {
-    return formRef.current.elements[inputName].validity.valid;
-  }
-
-  useEffect(
-    () => {
-      if (inputNames) {
-        setIsFormValid(
-          inputNames.every((inputName) => checkInputValidity(inputName))
-        );
-      } else {
-        setIsFormValid(true);
-      }
-    },
-    // eslint-disable-next-line
-    inputValues ? [...inputValues] : []
-  );
-
   return (
     <>
-      <h4 className={`form-title ${titleClass}`}>{title}</h4>
+      <h4 className={`form-title ${titleClass ? titleClass : ''}`}>{title}</h4>
       <form
-        ref={formRef}
         noValidate="noValidate"
         className={`form ${isLoading ? "form_is-loading" : ""}`}
         id={`${name}-form`}

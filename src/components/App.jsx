@@ -1,5 +1,6 @@
+import * as mestoAuth from "./../utils/mestoAuth.js";
 import { useState, useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { ApiRequestLoadingContext } from "../contexts/ApiRequestLoadingContext";
 
@@ -13,6 +14,7 @@ import Login from "./Login/Login";
 import ProtectedRouteElement from "./ProtectedRoute/ProtectedRoute";
 
 function App() {
+  const navigate = useNavigate();
   const [selectedCard, setSelectedCard] = useState({});
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
@@ -51,8 +53,65 @@ function App() {
     setUserEmail(email);
   }
 
-  function changeAccessStatus(bool) {
-    setAccessStatus(bool);
+  const checkToken = (token) => {
+    setIsLoading(true);
+    mestoAuth
+      .checkTokenValidity(token)
+      .then(({ data }) => {
+        handleSetEmail(data.email);
+        handleChangeLoggedInState(true);
+        navigate("/home");
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
+  };
+
+  function handleLogin(formValuesObj) {
+    setIsLoading(true);
+    mestoAuth
+      .login(formValuesObj)
+      .then((data) => {
+        if (data.token) {
+          localStorage.setItem("jwt", data.token);
+          checkToken(data.token);
+        }
+      })
+      .catch((err) => {
+        console.error()
+        setAccessStatus(false);
+        setIsInfoTooltipOpen(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+        setTimeout(() => {
+          setIsInfoTooltipOpen(false);
+        }, 1000);
+      });
+  }
+
+  function handleRegister(formValuesObj) {
+    setIsLoading(true);
+    mestoAuth
+      .register(formValuesObj)
+      .then((res) => {
+        setAccessStatus(true);
+        setTimeout(() => {
+          navigate("/sign-in");
+        }, 3000);
+        console.log(res);
+        return res;
+      })
+      .catch((err) => {
+        setAccessStatus(false);
+        console.error()
+      })
+      .finally(() => {
+        setIsLoading(false);
+        setIsInfoTooltipOpen(true);
+        setTimeout(() => {
+          setIsInfoTooltipOpen(false);
+        }, 2000);
+      });
   }
 
   function handleLikeCard(card) {
@@ -65,7 +124,7 @@ function App() {
           state.map((oldCard) => (oldCard._id === card._id ? newCard : oldCard))
         );
       })
-      .catch((error) => console.log(error));
+      .catch(console.error)
   }
 
   function handleDeleteCard(cardId) {
@@ -76,7 +135,7 @@ function App() {
         setCards(cards.filter((card) => card._id !== cardId));
         closeAllPopups();
       })
-      .catch((err) => console.log(`Ошибка: ${err.status}`))
+      .catch(console.error)
       .finally(() => setIsLoading(false));
   }
 
@@ -88,7 +147,7 @@ function App() {
         setCurrentUser(updateProfileData);
         closeAllPopups();
       })
-      .catch((err) => console.log(`Ошибка: ${err.status}`))
+      .catch(console.error)
       .finally(() => setIsLoading(false));
   }
 
@@ -101,7 +160,7 @@ function App() {
         closeAllPopups();
       })
 
-      .catch((err) => console.log(`Ошибка: ${err.status}`))
+      .catch(console.error)
       .finally(() => setIsLoading(false));
   }
 
@@ -113,16 +172,12 @@ function App() {
         setCards([newCard, ...cards]);
         closeAllPopups();
       })
-      .catch((err) => console.log(`Ошибка: ${err.status}`))
+      .catch(console.error)
       .finally(() => setIsLoading(false));
   }
 
   function handleAvatarClick() {
     return setIsEditAvatarPopupOpen(true);
-  }
-
-  function handleChangeTooltipVisability(bool) {
-    return setIsInfoTooltipOpen(bool);
   }
 
   function handleEditProfileClick() {
@@ -176,6 +231,14 @@ function App() {
       setSelectedCard({});
     }, 500);
   }
+  useEffect(() => {
+    const jwt = localStorage.getItem("jwt");
+    if (!jwt) {
+      return;
+    }
+    checkToken(jwt);
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     api
@@ -241,25 +304,10 @@ function App() {
           />
           <Route
             path="/sign-up"
-            element={
-              <Register
-                changeTooltipVisability={handleChangeTooltipVisability}
-                changeAccessStatus={changeAccessStatus}
-              />
-            }
+            element={<Register onRegister={handleRegister} />}
           />
-          <Route
-            path="/sign-in"
-            element={
-              <Login
-                handleChangeLoggedInState={handleChangeLoggedInState}
-                handleSetEmail={handleSetEmail}
-                changeTooltipVisability={handleChangeTooltipVisability}
-                changeAccessStatus={changeAccessStatus}
-              />
-            }
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/sign-in" element={<Login onLogin={handleLogin} />} />
+          <Route path="/*" element={<Navigate to="/" replace />} />
         </Routes>
         {loggedIn && <Footer additionalClass={setAdditionalClass()} />}
         <ApiRequestLoadingContext.Provider value={isLoading}>

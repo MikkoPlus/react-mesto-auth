@@ -9,8 +9,7 @@ function PopupWithForm({
   isOpen,
   onClose,
   onSubmit,
-  inputNames,
-  inputValues,
+  isFormValid
 }) {
   return (
     <Popup isOpen={isOpen} onClose={onClose} type="form">
@@ -20,8 +19,7 @@ function PopupWithForm({
         formTitleClass="form-title_type_popup"
         handleSubmit={onSubmit}
         btnText={btnText}
-        inputNames={inputNames}
-        inputValues={inputValues}
+        isFormValid={isFormValid}
       >
         {children}
       </Form>

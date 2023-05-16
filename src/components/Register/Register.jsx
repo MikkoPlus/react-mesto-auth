@@ -1,38 +1,15 @@
 import Sign from "../Sign/Sign";
-import { Link, useNavigate } from "react-router-dom";
-import * as mestoAuth from "../../utils/mestoAuth.js";
+import { Link } from "react-router-dom";
 
-function Register({ changeAccessStatus, changeTooltipVisability }) {
-  const navigate = useNavigate();
 
-  const handleRegister = (formValuesObj) => {
-    mestoAuth
-      .register(formValuesObj)
-      .then((res) => {
-        changeAccessStatus(true);
-        setTimeout(() => {
-          navigate("/sign-in");
-        }, 3000);
-        console.log(res);
-        return res;
-      })
-      .catch((err) => {
-        changeAccessStatus(false);
-      })
-      .finally(() => {
-        changeTooltipVisability(true);
-        setTimeout(() => {
-          changeTooltipVisability(false);
-        }, 2000);
-      });
-  };
+function Register({ onRegister }) {
 
   return (
     <Sign
       name="register"
       title="Регистрация"
       btnText="Зарегистрироваться"
-      handleSubmit={handleRegister}
+      handleSubmit={onRegister}
     >
       <div className="sign__replace-wrapper">
         <p className="sign__replace-text">Уже зарегистриврованны? </p>

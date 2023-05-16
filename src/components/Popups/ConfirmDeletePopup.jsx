@@ -19,6 +19,7 @@ function ConfirmDeletePopup({
       btnText={`${isLoading ? "Удаление..." : "Да"}`}
       isOpen={isOpen}
       onClose={onClose}
+      isFormValid={true}
     />
   );
 }

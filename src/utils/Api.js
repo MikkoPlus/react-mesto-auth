@@ -1,9 +1,7 @@
-import { apiConfig } from "./utils.js";
-
 class Api {
   constructor(config) {
     this._baseUrl = config.baseUrlAdress;
-    this._autorisationToken = config.autorisationToken;
+    this._headers = config.headers;
     this._profileUrl = `${this._baseUrl}users/me`;
     this._profileAvatarUrl = `${this._profileUrl}/avatar`;
     this._cardsUrl = `${this._baseUrl}cards`;
@@ -13,42 +11,37 @@ class Api {
     return res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`);
   }
 
+  _request(url, options) {
+    return fetch(url, options).then(this._getResponse);
+  }
+
   _fetchGetRequest(url) {
-    return fetch(url, {
+    return this._request(url, {
       method: "GET",
-      headers: {
-        authorization: this._autorisationToken,
-      },
-    }).then((response) => this._getResponse(response));
+      headers: this._headers,
+    });
   }
 
   _fetchPostRequest(url, method, bodyData) {
-    return fetch(url, {
+    return this._request(url, {
       method: method,
-      headers: {
-        authorization: this._autorisationToken,
-        "Content-Type": "application/json",
-      },
+      headers: this._headers,
       body: bodyData,
-    }).then((response) => this._getResponse(response));
+    });
   }
 
   _fetchDeleteRequest(url, id) {
-    return fetch(`${url}/${id}`, {
+    return this._request(`${url}/${id}`, {
       method: "DELETE",
-      headers: {
-        authorization: this._autorisationToken,
-      },
-    }).then((response) => this._getResponse(response));
+      headers: this._headers,
+    });
   }
 
   _fetchChangeLikesState(url, id, method) {
-    return fetch(`${url}/${id}/likes`, {
+    return this._request(`${url}/${id}/likes`, {
       method: method,
-      headers: {
-        authorization: this._autorisationToken,
-      },
-    }).then((response) => this._getResponse(response));
+      headers: this._headers,
+    });
   }
 
   _transformDataToJSON(inputValues) {
@@ -96,6 +89,12 @@ class Api {
   }
 }
 
-const api = new Api(apiConfig);
+const api = new Api({
+  baseUrlAdress: "https://nomoreparties.co/v1/cohort-62/",
+  headers: {
+    "Content-Type": "application/json",
+    authorization: "21d67130-4b88-41b2-a64a-c76e797b432e",
+  },
+});
 
 export default api;

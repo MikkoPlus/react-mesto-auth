@@ -10,19 +10,13 @@ function Input({
   onChange,
   isPopupOpen,
   inputClass,
+  error
 }) {
-  const [isValid, setIsValid] = useState(false);
-  const [validMessage, setValidMessage] = useState("");
   const [isDirty, setIsDirty] = useState(false);
 
   const inputClassName = inputClass
     ? `form__input ${inputClass}`
     : "form__input";
-
-  function handleInputChange(e) {
-    setIsValid(e.target.validity.valid);
-    setValidMessage(e.target.validationMessage);
-  }
 
   useEffect(() => {
     setIsDirty(false);
@@ -38,14 +32,13 @@ function Input({
         placeholder={placeholder}
         minLength={minLength}
         maxLength={maxLength}
-        value={value}
-        onChange={(e) => onChange(e)}
-        onInput={handleInputChange}
+        value={value || ''}
+        onChange={onChange}
         onBlur={() => setIsDirty(true)}
       />
-      {isDirty && !isValid && (
+      {isDirty &&  (
         <span id={`input-error`} className="form__input-text-error">
-          {validMessage}
+          {error}
         </span>
       )}
     </>

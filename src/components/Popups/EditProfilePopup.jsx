@@ -1,23 +1,30 @@
-import { useState, useEffect, useContext } from "react";
+import { useEffect, useContext } from "react";
 import PopupWithForm from "./PopupWithForm";
 import Input from "../SingleComponent/Input";
 import { CurrentUserContext } from "../../contexts/CurrentUserContext";
+import { useFormAndValidation } from "../../hooks/useFormAndValidation";
 
 function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const { values, handleChange, errors, isValid, setValues, resetForm } =
+    useFormAndValidation();
+
+  const { name, about } = values;
   const currentUser = useContext(CurrentUserContext);
 
   useEffect(() => {
-    setName(currentUser.name);
-    setDescription(currentUser.about);
-  }, [currentUser, isOpen]);
+    resetForm();
+
+    if (isOpen) {
+      setValues({
+        name: currentUser.name,
+        about: currentUser.about,
+      });
+    }
+    // eslint-disable-next-line
+  }, [isOpen, currentUser]);
 
   function handleSubmit() {
-    onUpdateUser({
-      name,
-      about: description,
-    });
+    onUpdateUser(values);
   }
 
   return (
@@ -29,8 +36,7 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit}
-      inputNames={["name", "about"]}
-      inputValues={[name, description]}
+      isFormValid={isValid}
     >
       <Input
         type="text"
@@ -38,9 +44,10 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
         name="name"
         minLength="2"
         maxLength="20"
-        value={name || ""}
-        onChange={(e) => setName(e.target.value)}
+        value={name}
+        onChange={handleChange}
         isPopupOpen={isOpen}
+        error={errors.name}
       />
       <Input
         type="text"
@@ -48,9 +55,10 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
         name="about"
         minLength="2"
         maxLength="200"
-        value={description || ""}
-        onChange={(e) => setDescription(e.target.value)}
+        value={about}
+        onChange={handleChange}
         isPopupOpen={isOpen}
+        error={errors.about}
       />
     </PopupWithForm>
   );
