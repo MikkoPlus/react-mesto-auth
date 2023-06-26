@@ -58,7 +58,6 @@
 Для просмотра работы воспользуйтесь следующими данными(либо зарегестрируйтесь): 
 
 email: testEmail-1@mail.com
-
 password: qwerty123
 
 Для просмотра работы перейдите по ссылке https://mikkoplus.github.io/home
