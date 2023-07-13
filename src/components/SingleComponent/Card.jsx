@@ -1,4 +1,3 @@
-import trashBagIcon from "../../images/icons/trash.svg";
 import { useContext } from "react";
 import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 
@@ -22,9 +21,7 @@ function Card({ card, onCardClick, onCardLike, onTrashBagClick }) {
   return (
     <li className="place-card">
       {isOwnersCard && (
-        <img
-          src={trashBagIcon}
-          alt="trash-bag"
+        <div
           className="place-card__trash-bag"
           onClick={handleTrashBagClick}
         />
