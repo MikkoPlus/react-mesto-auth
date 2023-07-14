@@ -146,8 +146,6 @@ function App() {
     api
       .setUserInfo(requestObj)
       .then((updateProfileData) => {
-        const {name, about} = updateProfileData
-        console.log(name, about)
         setCurrentUser(updateProfileData);
         closeAllPopups();
       })
@@ -160,7 +158,6 @@ function App() {
     api
       .postAvatar(requestObj)
       .then((updateProfileData) => {
-        console.log(`currentUser: ${currentUser}, updatedUserData: ${updateProfileData}`)
         setCurrentUser(updateProfileData);
         closeAllPopups();
       })
@@ -238,7 +235,6 @@ function App() {
   }
   useEffect(() => {
     const jwt = document.cookie.jwt
-    console.log(jwt)
     if (!jwt) {
       return;
     }
