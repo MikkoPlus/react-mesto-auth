@@ -4,6 +4,11 @@ import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 
 function Main({onEditAvatar, onEditProfile, onCardClick, onAddCard, cards, onCardLike, onTrashBagClick, additionalClass}) {
   const { about, avatar, name } = useContext(CurrentUserContext);
+
+
+
+
+  
   return (
     <main className={`content ${additionalClass}`}>
       <section className="profile">

@@ -30,10 +30,10 @@ function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
         type="url"
         placeholder="Ссылка на аватар"
         name="avatar"
-        value={values.url}
+        value={values.avatar}
         onChange={handleChange}
         isPopupOpen={isOpen}
-        error={errors.url}
+        error={errors.avatar}
       />
     </PopupWithForm>
   );

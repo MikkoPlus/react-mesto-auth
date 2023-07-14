@@ -33,8 +33,12 @@ function App() {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
 
   function handleLogOut() {
-    localStorage.removeItem("jwt");
-    setLoggedIn(false);
+    mestoAuth
+    .signout()
+    .then(({message})=> {
+      setLoggedIn(false);
+      console.log(message)
+    })
   }
 
   function setAdditionalClass() {
@@ -53,11 +57,11 @@ function App() {
     setUserEmail(email);
   }
 
-  const checkToken = (token) => {
+  const checkToken = () => {
     setIsLoading(true);
     mestoAuth
-      .checkTokenValidity(token)
-      .then(({ data }) => {
+      .checkTokenValidity()
+      .then((data) => {
         handleSetEmail(data.email);
         handleChangeLoggedInState(true);
         navigate("/home");
@@ -71,9 +75,8 @@ function App() {
     mestoAuth
       .login(formValuesObj)
       .then((data) => {
-        if (data.token) {
-          localStorage.setItem("jwt", data.token);
-          checkToken(data.token);
+        if (data) {
+          checkToken();
         }
       })
       .catch((err) => {
@@ -98,7 +101,6 @@ function App() {
         setTimeout(() => {
           navigate("/sign-in");
         }, 3000);
-        console.log(res);
         return res;
       })
       .catch((err) => {
@@ -115,7 +117,7 @@ function App() {
   }
 
   function handleLikeCard(card) {
-    const isLiked = card.likes.some((human) => human._id === currentUser._id);
+    const isLiked = card.likes.some((human) => human === currentUser._id);
 
     api
       .toggleLikeStatus(card._id, isLiked)
@@ -144,6 +146,8 @@ function App() {
     api
       .setUserInfo(requestObj)
       .then((updateProfileData) => {
+        const {name, about} = updateProfileData
+        console.log(name, about)
         setCurrentUser(updateProfileData);
         closeAllPopups();
       })
@@ -156,6 +160,7 @@ function App() {
     api
       .postAvatar(requestObj)
       .then((updateProfileData) => {
+        console.log(`currentUser: ${currentUser}, updatedUserData: ${updateProfileData}`)
         setCurrentUser(updateProfileData);
         closeAllPopups();
       })
@@ -232,7 +237,8 @@ function App() {
     }, 500);
   }
   useEffect(() => {
-    const jwt = localStorage.getItem("jwt");
+    const jwt = document.cookie.jwt
+    console.log(jwt)
     if (!jwt) {
       return;
     }
@@ -241,24 +247,20 @@ function App() {
   }, []);
 
   useEffect(() => {
-    api
+    if (!loggedIn) {
+      setIsMenuOpened(false);
+    } else {
+      api
+      .getProfileData()
+      .then((data) => setCurrentUser(data))
+      .catch((err) => console.log(err));
+
+      api
       .getCards()
       .then((data) => {
         setCards(data);
       })
       .catch((err) => console.log(err));
-  }, []);
-
-  useEffect(() => {
-    api
-      .getProfileData()
-      .then((data) => setCurrentUser(data))
-      .catch((err) => console.log(err));
-  }, []);
-
-  useEffect(() => {
-    if (!loggedIn) {
-      setIsMenuOpened(false);
     }
   }, [loggedIn]);
 

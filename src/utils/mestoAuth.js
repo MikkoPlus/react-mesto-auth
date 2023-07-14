@@ -1,8 +1,12 @@
-export const BASE_URL = "https://auth.nomoreparties.co";
+// export const BASE_URL = "https://auth.nomoreparties.co";
+export const BASE_URL = 'http://localhost:3000';
 
 const request = (url, options) => {
-  return fetch(`${BASE_URL}/${url}`, options).then(getResponse)
-}
+  return fetch(`${BASE_URL}/${url}`, {
+    ...options,
+    credentials: 'include',
+  }).then(getResponse);
+};
 
 const getResponse = (res) => {
   return res.ok ? res.json() : Promise.reject(res);
@@ -10,30 +14,38 @@ const getResponse = (res) => {
 
 export const register = ({ email, password }) => {
   return request('signup', {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({ email, password }),
-  })
+  });
 };
 
 export const login = ({ email, password }) => {
   return request('signin', {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({ email, password }),
-  })
+  });
 };
 
-export const checkTokenValidity = (token) => {
+export const checkTokenValidity = () => {
   return request('users/me', {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json",
-      "Authorization" : `Bearer ${token}`
+      'Content-Type': 'application/json',
     },
-  })
+  });
+};
+
+export const signout = () => {
+  return request('signout', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };

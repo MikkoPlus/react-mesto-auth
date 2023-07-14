@@ -2,9 +2,9 @@ class Api {
   constructor(config) {
     this._baseUrl = config.baseUrlAdress;
     this._headers = config.headers;
-    this._profileUrl = `${this._baseUrl}users/me`;
+    this._profileUrl = `${this._baseUrl}/users/me`;
     this._profileAvatarUrl = `${this._profileUrl}/avatar`;
-    this._cardsUrl = `${this._baseUrl}cards`;
+    this._cardsUrl = `${this._baseUrl}/cards`;
   }
 
   _getResponse(res) {
@@ -12,12 +12,15 @@ class Api {
   }
 
   _request(url, options) {
-    return fetch(url, options).then(this._getResponse);
+    return fetch(url, {
+      ...options,
+      credentials: 'include',
+    }).then(this._getResponse);
   }
 
   _fetchGetRequest(url) {
     return this._request(url, {
-      method: "GET",
+      method: 'GET',
       headers: this._headers,
     });
   }
@@ -32,7 +35,7 @@ class Api {
 
   _fetchDeleteRequest(url, id) {
     return this._request(`${url}/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: this._headers,
     });
   }
@@ -58,29 +61,29 @@ class Api {
 
   postNewCard(requestObj) {
     const bodyData = this._transformDataToJSON(requestObj);
-    return this._fetchPostRequest(this._cardsUrl, "POST", bodyData);
+    return this._fetchPostRequest(this._cardsUrl, 'POST', bodyData);
   }
 
   postProfileData(inputValues) {
     const bodyData = this._transformDataToJSON(inputValues);
-    return this._fetchPostRequest(this._profileUrl, "PATCH", bodyData);
+    return this._fetchPostRequest(this._profileUrl, 'PATCH', bodyData);
   }
 
   setUserInfo(requestObj) {
     const bodyData = this._transformDataToJSON(requestObj);
-    return this._fetchPostRequest(this._profileUrl, "PATCH", bodyData);
+    return this._fetchPostRequest(this._profileUrl, 'PATCH', bodyData);
   }
 
   postAvatar(requestObj) {
     const bodyData = this._transformDataToJSON(requestObj);
-    return this._fetchPostRequest(this._profileAvatarUrl, "PATCH", bodyData);
+    return this._fetchPostRequest(this._profileAvatarUrl, 'PATCH', bodyData);
   }
 
   toggleLikeStatus(cardId, isLiked) {
     if (!isLiked) {
-      return this._fetchChangeLikesState(this._cardsUrl, cardId, "PUT");
+      return this._fetchChangeLikesState(this._cardsUrl, cardId, 'PUT');
     } else {
-      return this._fetchChangeLikesState(this._cardsUrl, cardId, "DELETE");
+      return this._fetchChangeLikesState(this._cardsUrl, cardId, 'DELETE');
     }
   }
 
@@ -90,11 +93,11 @@ class Api {
 }
 
 const api = new Api({
-  baseUrlAdress: "https://nomoreparties.co/v1/cohort-62/",
+  baseUrlAdress: 'http://localhost:3000',
   headers: {
-    "Content-Type": "application/json",
-    authorization: "21d67130-4b88-41b2-a64a-c76e797b432e",
+    'Content-Type': 'application/json',
   },
+  credentials: 'include',
 });
 
 export default api;
